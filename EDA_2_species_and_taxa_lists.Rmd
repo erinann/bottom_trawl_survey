@@ -1,0 +1,190 @@
+---
+title: "EDA 2 - Species list and data counts"
+author: "Erin LaBrecque"
+date: "10/14/2020"
+output: html_document
+---
+
+This is file 2 of an exploratory data analysis (EDA) of the NEFSC Bottom Trawl Survey catch counts from 2008 through 2019.
+
+You must run the code in EDA 1 once to create and save the intermediate files used in EDA 2.  
+
+```{r setup, results='hide', message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, 
+                      fig.width = 7, fig.height = 6.5)
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(rfishbase)
+```
+
+
+# Loading the data  
+These are the outputs from the first EDA.    
+```{r readin}
+dta <- read_rds("output_input/dta.rds")
+dta_ed <- read_rds("output_input/dta_ed.rds")
+sp_fish <- read_rds("output_input/sp_fish.rds")
+sp_sealife <- read_rds("output_input/sp_sealife.rds")
+
+# loading the fishbase and sealife base data sets
+# this will take a few moments but it will speed up analysis later in the file
+fish_taxa <- load_taxa(server = "fishbase")
+sealife_taxa <- load_taxa(server = "sealifebase")
+```
+
+# Taxonomy 
+
+I have a sneaky suspicion that having the full taxonomic hierarchy for each species will be useful at some point. Because all the data munging so far has been in FishBase, it is easiest to get taxonomic information from there. Note that ITIS taxonomy is slightly different than FishBase - e.g. ITIS ranks Chondrichthyes as a Class and Elasmobranchii as a Subclass, while FishBase ranks Chondrichthyes as a Superclass and Elasmobranchii as a Class.  
+
+This query is only for species. Instances of Genus, Family, Order, and Class are in the next section.  
+
+```{r sp_taxa_hierarchy}
+# adding fish taxa hierarchy to the fish species information, and adding 
+# group (fish/not-fish) identifier (for graphing later)
+sp_fish <- sp_fish %>% 
+  left_join(fish_taxa, by = "SpecCode") %>% 
+  mutate(type = "fish")
+
+# adding non-fish taxa hierarchy to the non-fish species information
+# group (fish/not-fish) identifier (for graphing later)
+sp_sealife <- sp_sealife %>% 
+  left_join(sealife_taxa, by = "SpecCode") %>% 
+  mutate(type = "not_fish")
+
+# printing out a few rows of data to inspect it
+tail(sp_fish, 4) %>% 
+  kable(caption = "Three rows of the fish species data") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  column_spec(c(2, 4, 6), italic = TRUE)
+
+# printing out a few rows of data to inspect it
+tail(sp_sealife, 4) %>% 
+  kable(caption = "Three rows of the sealife species data") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  column_spec(c(2, 4, 6), italic = TRUE)
+```
+<br/> 
+
+
+A lot of the data is classified down to species, but as seen in EDA 1, some critters are only classified to Genus, Family, Order, and in a couple cases, Class. The next few sections pull out higher taxa instances and fill in the appropriate taxonomic information.
+```{r taxa_separation}
+taxa_ls <- names(dta[8:ncol(dta)]) %>% 
+  sort()
+
+# converting taxa list to sentence case
+taxa_sentence_case <- str_to_sentence(taxa_ls)
+
+# parsing out the higher taxonomy levels
+poda <-  str_subset(taxa_sentence_case, pattern = "poda$")
+
+formes <- str_subset(taxa_sentence_case, pattern = "formes$")
+
+fam <- str_subset(taxa_sentence_case, pattern = "idae$")
+
+unknws <- str_subset(taxa_sentence_case, pattern = "^Unknown")
+
+genus <- str_subset(taxa_sentence_case, pattern = " sp$")
+
+ptrn <- c("Trash species in catch", "Crustacea shrimp",
+          "Selachimorpha", "Stelleroidea")
+outliers <- map(ptrn, str_subset, string = taxa_sentence_case) %>%
+  unlist()
+
+species <- taxa_sentence_case[!taxa_sentence_case %in%
+                                c(poda, formes, fam, genus, unknws, outliers)]
+```
+
+<br/>  
+
+This sections makes a list of all the observations of organisms that were not classified to species and saves the list as a .csv file.  
+```{r non_species}
+# all non-species entries. Unknowns are not included.
+non_sp_taxa <- tibble(non_sp = c(formes, poda, fam, genus, outliers)) %>% 
+  mutate(level = case_when(str_detect(non_sp, pattern = "Cephalopoda") ~ "Class",
+                           str_detect(non_sp, pattern = "formes$") |
+                             str_detect(non_sp, pattern = "Octopoda") |
+                             str_detect(non_sp, pattern = "Stomatopoda") ~ "Order",
+                           str_detect(non_sp, pattern = "idae$") ~ "Family",
+                           str_detect(non_sp, pattern = " sp$") ~ "Genus",
+                           TRUE ~ " ")
+         )
+
+# saving as a csv
+write_csv(non_sp_taxa, "output_csv/non_sp_taxa.csv")
+```
+
+I went though the non-species taxa .csv file by hand to fixed spelling mistakes and add the appropriate additional information. Unfortunately this could not be done programmatically with `rfishbase` or with any of the other packages I looked into. 
+
+```{r}
+# reading in the data edited for spelling mistakes and synonyms
+non_sp_taxa <- read_csv("output_csv/non_sp_taxa_edit.csv") 
+```
+
+## Joining the taxa data to the trawl data
+All the work so far has been to assess the species in the data sets without looking at the counts of organisms from the trawls. Here we add the taxonomic trawl count data for species.   
+
+```{r combining_information}
+# making a single data frame to add to the count data
+both_fish_sealife <- bind_rows(sp_fish, sp_sealife)
+
+# combining the count data with the species data and
+# removing higher level taxa data
+dta_sp_only <- dta_ed %>% 
+  left_join(both_fish_sealife, by = c("taxa"= "BTS_sp")) %>% # using the BTS names here
+  rename(BTS_sp = taxa) %>% 
+  filter(!is.na(Species)) %>% 
+  mutate(level = "Species")
+
+# combining the count data with the higher level taxa data and
+# removing the species level data
+dta_nonsp_only <- dta_ed %>% 
+  left_join(non_sp_taxa, by = c("taxa" = "BTS_sp")) %>% 
+  rename(BTS_sp = taxa) %>% 
+  filter(!is.na(Com_name))
+```
+
+
+## Quesiton:  
+How many of each species were caught in the trawls over all the data sets?
+
+Printing species, common names and counts.
+```{r species_list}
+dta_sp_only %>% 
+  count(BTS_sp, Com_name, type) %>% 
+  arrange(type) %>% 
+  kable(col.names = c("BTS name", "Common name", "Category", "Count")) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  column_spec(1, italic = TRUE)
+```
+<br/>  
+
+I need to come up with a ecologically relevant way to group species. What would you suggest? The taxonomic information for each species is also in the data and I can use Genus, Family, Order, and Class to filter, group, and summarize the data. 
+
+
+## Question:
+How many organisms that could not be classified to species were caugt in the trawls over all the data sets?
+
+Printing taxa level, common names, and counts.  
+```{r non_species_list}
+dta_nonsp_only %>% 
+  count(BTS_sp, level, Com_name, type) %>% 
+  arrange(type) %>% 
+  kable(col.names = c("BTS name", "Taxa level", "Common name", "Category", "Count")) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+<br/>  
+
+All of these data also have `cruiseid`, `datetime` (except the 13 missing mentioned in EDA 1), and `stratum` information associated with them. The data are now in a format to parse, aggregate, and summarize in multiple ways (e.g. spatially, temporally, by taxa level).
+
+#  Wrap up EDA 2  
+In the next EDA, I will incorporate swim bladder and habitat information for species.  
+
+Saving the intermediate files for the next EDA. Note that `sp_fish` and `sp_sealife` have changed since the first EDA and they are being saved again.
+```{r save}
+write_rds(dta_nonsp_only, "output_input/dta_and_non_species.rds")
+write_rds(dta_sp_only, "output_input/dta_and_species.rds")
+write_rds(sp_sealife, "output_input/sp_sealife.rds")
+write_rds(sp_fish, "output_input/sp_fish.rds")
+```
+

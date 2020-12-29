@@ -1,0 +1,374 @@
+---
+title: "EDA 1 - Cleaning species names via rfishbase"
+author: "Erin LaBrecque"
+date: "10/09/2020"
+output: html_document
+---
+
+This is Exploratory Data Analysis (EDA) file 1 of the NEFSC Bottom Trawl Survey catch counts from 2008 through 2019.  
+
+I exposed all the R code in case you wanted to explore it. If you want to explore and run the code in these HTML files, I can send you the rMarkdown files (.Rmd) or you can copy and paste the code from here. You will need to create the folders, `output_input` and `output_csv` in your working directory to store the intermediate .rds and .csv files. You will use `output_input` in this EDA and both `output_input` and `output_csv` will be used in subsequent EDAs.
+
+```{r setup, results='hide', message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, 
+                      fig.width = 7, fig.height = 6.5)
+library(knitr)
+library(tidyverse)
+library(fs)
+library(lubridate)
+library(kableExtra)
+library(rfishbase)
+```
+
+# Loading the data
+
+To successfully run this code, all the bottom trawl survey .csv files need to be in a folder called `data` that needs to be in your working directory. 
+
+```{r readin, results='hide'}
+# These lines of code tell R to look in the "data" folder, read in each .csv file,
+# and then bind all the row from each file together. All columns are kept.
+dta <- dir_ls(path = "data") %>% 
+  lapply(read_csv, col_types=cols(begindatetime=col_datetime("%d/%m/%Y-%H:%M:%S"))) %>% 
+  bind_rows()
+
+# filtering rows with missing metadata
+bad_dta <- dta %>% 
+  filter(is.na(begindatetime))
+
+# creating a metadata list to use later
+meta_data <- c("cruiseid", "cruise", "station", "beginlon", "beginlat", "begindatetime", "stratum")
+```
+
+When reading in the data you will get warnings about parsing failures. This is because the `col_types` arguments above is looking for a **"%d/%m/%Y-%H:%M:%S"** datetime format for `begindatetime`, but there are several rows in a few of the .csv files that do not have data in the `begindatetime` column.
+
+<br/>  
+Example warning
+
+:Warning: 2 parsing failures.
+
+|row|col|expected|actual|file|
+|---|-------------|---------------------------|---|-------------------------------------|
+|227|begindatetime|date like %d/%m/%Y-%H:%M:%S| - |'data/HB201301_FSCS_Catch_output.csv'|
+|373|begindatetime|date like %d/%m/%Y-%H:%M:%S| - |'data/HB201301_FSCS_Catch_output.csv'|  
+<br/>
+
+## Missing data from parse warnings
+
+These `r nrow(bad_dta)` Cruise ID/Station/Stratum combinations do not have a `begindatetime`, `latitude`, or `longitude`. Species were collected at these stations. 
+
+```{r missing_DT}
+bad_dta %>% 
+  select(cruiseid, cruise, station, stratum) %>% 
+  kable(col.names = c("Cruise ID", "Cruise", "Station", "Stratum"),
+               escape = FALSE) %>% 
+   kable_styling(bootstrap_options = c("striped"), full_width = TRUE) 
+
+# removing variable 
+rm(bad_dta)
+```
+<br/>  
+
+## Reorganizing the data frame
+
+```{r pivot}
+# making a list of taxa names from the column names
+taxa_ls <- names(dta[8:ncol(dta)]) %>% 
+  sort()
+
+# pivoting the table from wide to long,
+# putting taxa values in sentence case, adding year and month variables
+dta_long <- dta %>% 
+  pivot_longer(all_of(taxa_ls),
+               names_to = "taxa", 
+               values_to = "count",
+               values_drop_na = TRUE) %>% 
+  mutate(taxa  = str_to_sentence(taxa),
+         year =  year(begindatetime),
+         month = month(begindatetime, abbr = FALSE, label = TRUE))
+
+# removing 0 counts to work with a smaller data set
+dta_ed <- dta_long %>% 
+  filter(count > 0)
+
+# dta_long is almost 70 MB. Removing it.
+rm(dta_long)
+```
+<br/>  
+
+# Query FishBase and SeaLifeBase
+
+Using the r package, `rfishbase`, we can access information in [FishBase](www.fishbase.org) without having to go through each species one-by-one. `rfishbase` also has an experimental feature to query [SeaLifeBase](www.sealifebase.ca). In the next few sections I query both databases using `species()` to determine if a given species and associated life history data can be retrieved programmatically.
+
+<br/>  
+
+First, separate the data into the different taxonomic groups. Life history information can only be retrieved for species.  
+```{r taxa_separation}
+# converting taxa list to sentence case
+taxa_sentence_case <- str_to_sentence(taxa_ls)
+
+# parsing out the higher taxonomy levels
+poda <-  str_subset(taxa_sentence_case, pattern = "poda$")
+
+formes <- str_subset(taxa_sentence_case, pattern = "formes$") 
+
+fam <- str_subset(taxa_sentence_case, pattern = "idae$") 
+
+unknws <- str_subset(taxa_sentence_case, pattern = "^Unknown")
+
+genus <- str_subset(taxa_sentence_case, pattern = " sp$")
+
+ptrn <- c("Trash species in catch", "Crustacea shrimp", 
+          "Selachimorpha", "Stelleroidea")
+outliers <- map(ptrn, str_subset, string = taxa_sentence_case) %>% 
+  unlist()
+  
+species <- taxa_sentence_case[!taxa_sentence_case %in% 
+                                c(poda, formes, fam, genus, unknws, outliers)]
+```
+
+- unknws = `r length(unknws)` 
+- outliers = `r length(outliers)`  
+- poda = `r length(poda)`  
+- formes = `r length(formes)`  
+- fam = `r length(fam)`  
+- genus = `r length(genus)`  
+- species = `r length(species)`  
+
+<br/>  
+
+```{r table_others}
+kable(list(outliers, poda, formes, unknws), 
+      col.names = NULL,
+      caption = "Unknown and taxa above Family")  %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = TRUE) 
+```
+
+<br/>   
+
+```{r table_family}
+fam %>% 
+  as_tibble() %>% 
+  split(1:3) %>% 
+  kable(col.names = "Family",
+        caption = "Families") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", full_width = TRUE)) 
+```
+
+<br/>    
+
+```{r table_genus}
+genus %>% 
+  as_tibble() %>% 
+  split(1:2) %>%  
+  kable(col.names = "Genus",
+        caption = "Genera") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", full_width = TRUE)) 
+```
+
+<br/>  
+
+Now query the databases for species. This will take a minute or two if the databases have not been cashed.
+```{r query}
+# querying fishbase to see which taxa are fish
+sp_fish <- species(species, fields = c("SpecCode", "Species", "FBname"), 
+                   server = "fishbase") %>% 
+  rename(BTS_sp = Species, Com_name = FBname)
+
+# querying sealifebase to see which taxa are something other than fish
+sp_sealife <- species(species, fields = c("SpecCode", "Species", "FBname"), 
+                      server = "sealifebase") %>% 
+  rename(BTS_sp = Species, Com_name = FBname)
+```
+
+<br/>  
+
+This section checks that all species listed have been identified in one of the two databases.  
+```{r combine_query_results}
+# turning the species list into a data frame
+sp_full <- tibble(species) %>% 
+  rename(BTS_sp = species)
+
+# combining the query results with the original list of species and renaming columns
+# FB = fishbase, SLB = sealifebase
+sp_checks <- bind_cols(sp_full, sp_fish, sp_sealife) %>% 
+  select(-starts_with("Com_name")) %>% 
+  rename(BTS_sp = BTS_sp...1,
+         FB_SpecCode = SpecCode...2,
+         FB_species = BTS_sp...3,
+         SLB_SpecCode = SpecCode...5,
+         SLB_species = BTS_sp...6)
+
+# determining what entries in the species list were not in either database
+not_in_either_db <- sp_checks %>% 
+  filter(is.na(FB_species) & is.na(SLB_species)) %>% 
+  select(BTS_sp)
+```
+<br/>  
+
+`r nrow(not_in_either_db)` species in the bottom trawl data set were not found in either database using the function `species()`.
+```{r table_species}
+not_in_either_db %>% 
+  as_tibble() %>% 
+  split(1:3) %>%
+  kable(caption = "Species in the BTS data not found in either database") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", full_width = TRUE)) %>%
+  column_spec(1, italic = TRUE) %>% 
+  column_spec(2, italic = TRUE) %>% 
+  column_spec(3, italic = TRUE)
+```
+<br/>  
+
+### Checking for synonoms  
+The species listed above might be in the databases under different names. Thankfully `rfishbase` has a function that looks up synonyms.  
+
+```{r synonyms}
+# checking for synonyms in fishbase, removing NAs, removing any duplicates
+sp_fish_sy <- synonyms(pull(not_in_either_db), server = "fishbase") %>% 
+  select(BTS_sp = synonym, Status, SpecCode, TSN, DB_sp = Species) %>% 
+  filter(!is.na(TSN)) %>% 
+  distinct(DB_sp, .keep_all = TRUE)
+
+# checking for synonyms in sealifebase and removing NAs, removing any duplicates
+sp_sealife_sy <- synonyms(pull(not_in_either_db), server = "sealifebase") %>% 
+  select(BTS_sp = synonym, Status, SpecCode, DB_sp = Species) %>% 
+  filter(!is.na(Status)) %>% 
+  distinct(DB_sp, .keep_all = TRUE)
+
+# checking to see if any species were missed
+if (nrow(sp_fish_sy) + nrow(sp_sealife_sy) == nrow(not_in_either_db)){
+  print("All species acounted for!")
+} else {
+  paste(nrow(not_in_either_db) - (nrow(sp_fish_sy) + nrow(sp_sealife_sy)), "species not accounted for.")
+}
+```
+
+<br/>
+
+### Finding the species that did not have synonyms
+
+```{r rogue_species}
+no_syn_sp <- bind_rows(sp_fish_sy, sp_sealife_sy) %>% 
+  select(BTS_sp)
+
+not_in_either_db %>% 
+  filter(!BTS_sp %in% no_syn_sp$BTS_sp) %>% 
+  kable(col.name = "BTS name",
+        caption = "Species in the BTS data not found as synonyms the databases") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  column_spec(1, italic = TRUE)
+```
+<br/>  
+
+Looks like a of couple misspellings (or a character limit was set in the bottom trawl survey database), not synonym issues. This section fixes the misspelling but keeps the original spelling in `BTS_sp` column to reference back to the original data. 
+```{r spelling_fix}
+sp_spell_fix <- species(c("Urophycis earllii", "Aluterus heudelotii"), 
+                  fields = c("SpecCode", "Species", "FBname"), server = "fishbase") %>% 
+  rename(DB_sp = Species, Com_name = FBname) %>% 
+  mutate(BTS_sp = case_when(DB_sp == "Urophycis earllii" ~ "Urophycis earlli",
+                            DB_sp == "Aluterus heudelotii" ~ "Aluterus heudeloti"))
+
+
+#combining data frames
+sp_syn <- bind_rows(sp_fish_sy, sp_sealife_sy)
+
+# printing out table
+sp_syn %>%
+  select(BTS_sp, Status, DB_sp) %>%
+  kable(caption = "Synonyms found in FishBase and SeaLifeBase",
+  col.names = c("BTS name", "Status", "Database name")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", full_width = TRUE)) %>%
+  column_spec(1, italic = TRUE) %>%
+  column_spec(3, italic = TRUE)
+```
+
+<br/>   
+ 
+This section queries FishBase and SeaLifeBase to get the species codes and common names for the synonyms.  
+```{r query_2}
+# getting common names and species codes for FishBase then joining to the synonym data frame
+# to attach the original names
+sp_fish_sy_spcodes <- species(sp_fish_sy$DB_sp,  
+                              fields = c("SpecCode", "Species", "FBname"), 
+                              server = "fishbase") %>% 
+  rename(DB_sp = Species, Com_name = FBname) %>% 
+  left_join(sp_fish_sy, by = "SpecCode")%>% 
+  select(SpecCode, BTS_sp, Status, Com_name, DB_sp = DB_sp.x, TSN)
+
+# same for sealife base
+sp_sealife_sy_spcodes <- species(sp_sealife_sy$DB_sp,  
+                              fields = c("SpecCode", "Species", "FBname"), 
+                              server = "sealifebase") %>% 
+  rename(DB_sp = Species, Com_name = FBname) %>% 
+  left_join(sp_sealife_sy, by = "SpecCode")%>% 
+  select(SpecCode, BTS_sp, Status, Com_name, DB_sp = DB_sp.x)
+```
+
+### Combing data frames
+
+```{r}
+# removing the NAs (not fish) from the original fish query and adding in the new spellings
+sp_fish_almost_all <- sp_fish %>% 
+  filter(!is.na(BTS_sp)) %>% 
+  bind_rows(sp_spell_fix) %>% 
+  mutate(DB_sp = ifelse(is.na(DB_sp), BTS_sp, DB_sp))
+
+sp_fish_all <- sp_fish_almost_all %>% 
+  bind_rows(sp_fish_sy_spcodes)
+
+# same for sealifebase but do not need to add in the misspellings
+sp_sealife_all <- sp_sealife %>% 
+  filter(!is.na(BTS_sp)) %>% 
+  mutate(DB_sp = BTS_sp) %>% 
+  bind_rows(sp_sealife_sy_spcodes)
+```
+
+Species names have been checked, but the common names have not. This section checks the common names for all the species.
+
+```{r com_name_check}
+sp_sealife_all %>% 
+  filter(is.na(Com_name)) %>% 
+  select(-SpecCode) %>% 
+  kable(col.names = c("BTS name", "Common name", "Database name", "Status"),
+        caption = "Missing common name") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", full_width = TRUE)) %>% 
+  column_spec(c(1,3), italic = TRUE)
+
+
+sp_fish_all %>% 
+  filter(is.na(Com_name)) %>% 
+  select(-SpecCode, -TSN) %>% 
+  kable(col.names = c("BTS name", "Common name", "Database name", "Status"),
+        caption = "Missing common name") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", full_width = TRUE)) %>% 
+  column_spec(c(1,3), italic = TRUE)
+```
+<br/>
+
+Adding the common names to the data.
+
+```{r fix_common_name}
+sp_sealife_all <- sp_sealife_all %>% 
+  mutate(Com_name = case_when(BTS_sp == "Pandalus propinquus" ~ "Shrimp",
+                              TRUE ~ Com_name))
+
+sp_fish_all <- sp_fish_all %>% 
+  mutate(Com_name = case_when(BTS_sp == "Polymetme thaeocoryla" ~ "Lightfishes",
+                              TRUE ~ Com_name))
+```
+
+
+<br/>  
+
+# Wrap up EDA 1
+
+This file is getting long. I'll save the outputs here an start a new file to look up habitats and gas bladder information. Un-comment (remove #) to write out the data files.
+```{r save}
+write_rds(dta, "output_input/dta.rds")
+write_rds(dta_ed, "output_input/dta_ed.rds")
+write_rds(sp_sealife_all, "output_input/sp_sealife.rds")
+sp_fish_all %>% 
+  select(-TSN) %>% 
+  write_rds("output_input/sp_fish.rds")
+
+```
+

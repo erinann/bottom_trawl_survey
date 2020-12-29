@@ -1,0 +1,69 @@
+BTS_sp,level,Com_name,DB_sp,Status,Genus,Subfamily,Family,Order,Class,SuperClass,Phylum,Kingdom,type,habitat,swimbladder,Notes
+Cephalopoda,Class,"Squid, octopus, cuttlefish, nautilus",Cephalopoda,,NA,NA,NA,NA,Cephalopoda,NA,Mollusca,Animalia,not_fish,,NP,
+Selachimorpha,Class,"Sharks, rays, and skates",Elasmobranchii,invalid,NA,NA,NA,NA,Elasmobranchii,Chondrichthyes,Chordata,Animalia,fish,,NP,
+Stelleroidea,Class,Sea stars,Asteroidea,invalid,NA,NA,NA,NA,Asteroidea,NA,Echinodermata,Animalia,not_fish,,NP,
+Alepocephaliidae,Family,Smelts,Alepocephalidae,misspelling,NA,NA,Alepocephalidae,Osmeriformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Apogonidae,Family,Cardinalfishes,Apogonidae,,NA,NA,Apogonidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Balistidae,Family,Triggerfish,Balistidae,,NA,NA,Balistidae,Tetraodontiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Blenniidae,Family,Combtooth blenny,Blenniidae,,NA,NA,Blenniidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Bothidae,Family,Lefteye flounders,Bothidae,,NA,NA,Bothidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,"have swim bladder as larvae, lose it as adult"
+Calappidae,Family,Crabs,Calappidae,,NA,NA,Calappidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,
+Cancridae,Family,Crabs,Cancridae,,NA,NA,Cancridae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,
+Caproidae,Family,Boarfishes,Caproidae,,NA,NA,Caproidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Carcharhinidae,Family,Requiem sharks,Carcharhinidae,,NA,NA,Carcharhinidae,Carcharhiniformes,Elasmobranchii,Chondrichthyes,Chordata,Animalia,fish,,NP,
+Clupeidae,Family,"Herrings, shads, sardines, menhadens",Clupeidae,,NA,NA,Clupeidae,Clupeiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3692464/
+Congridae,Family,Conger and garden eels,Congridae,,NA,NA,Congridae,Anguilliformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,https://www.encyclopedia.com/environment/encyclopedias-almanacs-transcripts-and-maps/anguilliformes-eels-and-morays
+Cottidae,Family,Sculpins,Cottidae,,NA,NA,Cottidae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Cyclopteridae,Family,Lumpfish,Cyclopteridae,,NA,NA,Cyclopteridae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Gadidae,Family,Cods,Gadidae,,NA,NA,Gadidae,Gadiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,https://asa.scitation.org/doi/10.1121/1.5134683
+Galatheidae,Family,Squat lobsters,Galatheidae,,NA,NA,Galatheidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,
+Gobiidae,Family,True gobies,Gobiidae,,NA,NA,Gobiidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Holocentridae,Family,"Squirrelfish, soldierfish ",Holocentridae,,NA,NA,Holocentridae,Beryciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3692464/
+Labridae,Family,Wrasses,Labridae,,NA,NA,Labridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Lutjanidae,Family,Snappers,Lutjanidae,,NA,NA,Lutjanidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Macrouridae,Family,Deep sea Gadiformes,Macrouridae,,NA,NA,Macrouridae,Gadiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Majidae,Family,Crabs,Majidae,,NA,NA,Majidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,
+Moridae,Family,"Codlings, hakelings, moras",Moridae,,NA,NA,Moridae,Gadiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,https://www.jstor.org/stable/1445886?seq=1
+Muraenidae,Family,Moray eels,Muraenidae,,NA,NA,Muraenidae,Anguilliformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Myctophidae,Family,Lanternfish,Myctophidae,,NA,NA,Myctophidae,Myctophiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,? Superorder Scopelomorpha is listed but not Order
+Ogcocephalidae,Family,"Deep sea anglerfish, batfishes, seabats",Ogcocephalidae,,NA,NA,Ogcocephalidae,Lophiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Ophichthidae,Family,Snake eels,Ophichthidae,,NA,NA,Ophichthidae,Anguilliformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Ophidiidae,Family,Cusk-eels,Ophidiidae,,NA,NA,Ophidiidae,Ophidiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,https://www.sciencedaily.com/releases/2008/09/080924175158.htm
+Paralepidae,Family,Barracudina,Paralepididae,synonym,NA,NA,Paralepidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Pleuronectidae,Family,Righteye flounders,Pleuronectidae,,NA,NA,Pleuronectidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,"have swim bladder as larvae, lose it as adult"
+Pomacentridae,Family,"Damselfishes, clownfishes",Pomacentridae,,NA,NA,Pomacentridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Portunidae,Family,Swimming crabs,Portunidae,,NA,NA,Portunidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,
+Scaridae,Family,Parrotfishes,Scaridae,,NA,NA,Scaridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Sciaenidae,Family,"Drums, croakers",Sciaenidae,,NA,NA,Sciaenidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Scombridae,Family,"Mackerel, tuna, bonito",Scombridae,,NA,NA,Scombridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Scorpaenidae,Family,Scorpionfishes,Scorpaenidae,,NA,NA,Scorpaenidae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Sepiolidae,Family,Bobtail squid,Sepiolidae,,NA,NA,Sepiolidae,Sepiolida,Cephalopoda,NA,Mollusca,Animalia,not_fish,,NP,
+Serranidae,Family,"Basses, groupers",Serranidae,,NA,NA,Serranidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Squalidae,Family,"dogfish sharks, spiny dogfish",Squalidae,,NA,NA,Squalidae,Squaliformes,Elasmobranchii,Chondrichthyes,Chordata,Animalia,fish,,NP,
+Sternoptychidae,Family,deepsea hatchetfishes,Sternoptychidae,,NA,NA,Sternoptychidae,Stomiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NA,guessing
+Stomiidae,Family,Barbeled dragonfishes,Stomiidae,,NA,NA,Stomiidae,Stomiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NA,guessing
+Stromateidae,Family,Butterfish,Stromateidae,,NA,NA,Stromateidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Syngnathidae,Family,"seahorses, pipefish, seadragons",Syngnathidae,,NA,NA,Syngnathidae,Syngnathiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NA,guessing
+Synodontidae,Family,Lizardfish,Synodontidae,,NA,NA,Synodontidae,Aulopiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,Aulopifomes either have a vestigial gas bladder or lack it entirely
+Tetraodontidae,Family,Pufferfish,Tetraodontidae,,NA,NA,Tetraodontidae,Tetraodontiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Trichiuridae,Family,Cutlassfish,Trichiuridae,,NA,NA,Trichiuridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Triglidae,Family,"Sea robins, gurnard",Triglidae,,NA,NA,Triglidae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Uranoscopidae,Family,Stargazers,Uranoscopidae,,NA,NA,Uranoscopidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Zoarcidae,Family,Eelpouts,Zoarcidae,,NA,NA,Zoarcidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Artediellus,Genus,Sculpins,Artediellus,,Artediellus,NA,Cottidae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Chlorophthalmus,Genus,Greeneyes,Chlorophthalmus,,Chlorophthalmus,NA,Chlorophthalmus,Aulopiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,Aulopifomes either have a vestigial gas bladder or lack it entirely
+Citharichthys,Genus,Large-toothed flounders,Citharichthys,,Citharichthys,NA,Paralichthyidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,"have swim bladder as larvae, lose it as adult"
+Etropus,Genus,Large-toothed flounders,Etropus,,Etropus,NA,Paralichthyidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,"have swim bladder as larvae, lose it as adult"
+Fistularia,Genus,Cornetfishes,Fistularia,,Fistularia,NA,Fistulariidae,Syngnathiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NA,guessing
+Ovalipes,Genus,Crabs,Ovalipes,,Ovalipes,NA,Portunidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,
+Paralichthys,Genus,Large-toothed flounders,Paralichthys,,Paralichthys,NA,Paralichthyidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,"have swim bladder as larvae, lose it as adult"
+Penaeus,Genus,Prawns,Penaeus,,Penaeus,NA,Penaeidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,
+Sphyraena,Genus,Barracuda,Sphyraena,,Sphyraena,NA,Sphyraenidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Symphurus,Genus,Flatfish,Symphurus,,Symphurus,Symphurinae,Cynoglossidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,"have swim bladder as larvae, lose it as adult"
+Urophycis,Genus,Hakes,Urophycis,,Urophycis,NA,Phycidae,Gadiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Anguilliformes,Order,Eels,Anguilliformes,,NA,NA,NA,Anguilliformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Crustacea shrimp,Order,Shrimp,Decapoda,common_name,NA,NA,NA,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,
+Lophiiformes,Order,Anglerfish,Lophiiformes,,NA,NA,NA,Lophiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,gas,
+Octopoda,Order,Octopus,Octopoda,,NA,NA,NA,Octopoda,Cephalopoda,NA,Mollusca,Animalia,not_fish,,NP,
+Pleuronectiformes,Order,Flatfish,Pleuronectiformes,,NA,NA,NA,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,,NP,"have swim bladder as larvae, lose it as adult"
+Stomatopoda,Order,Mantis shrimp,Stomatopoda,,NA,NA,NA,Stomatopoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,,NP,

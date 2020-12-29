@@ -1,0 +1,69 @@
+BTS_sp,Status,DB_sp,Com_name,level,Genus,Subfamily,Family,Order,Class,SuperClass,Phylum,Kingdom,type,others,host,epiphytic,bathydemersal,bathypelagic,demersal,benthopelagic,benthic,pelagic-oceanic,pelagic-neritic,pelagic,epipelagic,reef-associated
+Artediellus,NA,Artediellus,Sculpins,Genus,Artediellus,NA,Cottidae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,1,NA,14,NA,NA,NA,NA,NA,NA,NA
+Chlorophthalmus,NA,Chlorophthalmus,Greeneyes,Genus,Chlorophthalmus,NA,Chlorophthalmus,Aulopiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,13,NA,2,NA,NA,NA,NA,NA,NA,NA
+Citharichthys,NA,Citharichthys,Large-toothed flounders,Genus,Citharichthys,NA,Paralichthyidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,2,NA,20,1,NA,NA,NA,NA,NA,1
+Etropus,NA,Etropus,Large-toothed flounders,Genus,Etropus,NA,Paralichthyidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,9,1,NA,NA,NA,NA,NA,NA
+Fistularia,NA,Fistularia,Cornetfishes,Genus,Fistularia,NA,Fistulariidae,Syngnathiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,NA,NA,NA,NA,1,NA,NA,3
+Paralichthys,NA,Paralichthys,Large-toothed flounders,Genus,Paralichthys,NA,Paralichthyidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,17,NA,NA,NA,NA,NA,NA,1
+Sphyraena,NA,Sphyraena,Barracuda,Genus,Sphyraena,NA,Sphyraenidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,NA,NA,NA,1,14,NA,NA,13
+Symphurus,NA,Symphurus,Flatfish,Genus,Symphurus,Symphurinae,Cynoglossidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,25,NA,44,4,NA,NA,NA,NA,NA,3
+Urophycis,NA,Urophycis,Hakes,Genus,Urophycis,NA,Phycidae,Gadiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,1,NA,7,NA,NA,NA,NA,NA,NA,NA
+Alepocephaliidae,misspelling,Alepocephalidae,Smelts,Family,NA,NA,Alepocephalidae,Osmeriformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,27,60,2,9,NA,NA,NA,NA,NA,NA
+Apogonidae,NA,Apogonidae,Cardinalfishes,Family,NA,NA,Apogonidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,59,28,NA,NA,15,NA,NA,252
+Balistidae,NA,Balistidae,Triggerfish,Family,NA,NA,Balistidae,Tetraodontiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,5,1,NA,NA,2,NA,NA,35
+Blenniidae,NA,Blenniidae,Combtooth blenny,Family,NA,NA,Blenniidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,180,18,NA,NA,11,NA,NA,192
+Bothidae,NA,Bothidae,Lefteye flounders,Family,NA,NA,Bothidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,38,1,116,1,NA,NA,1,NA,NA,7
+Caproidae,NA,Caproidae,Boarfishes,Family,NA,NA,Caproidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,8,NA,8,2,NA,NA,NA,NA,NA,NA
+Carcharhinidae,NA,Carcharhinidae,Requiem sharks,Family,NA,NA,Carcharhinidae,Carcharhiniformes,Elasmobranchii,Chondrichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,20,5,NA,5,3,1,NA,25
+Clupeidae,NA,Clupeidae,"Herrings, shads, sardines, menhadens",Family,NA,NA,Clupeidae,Clupeiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,3,8,NA,1,110,61,NA,14
+Congridae,NA,Congridae,Conger and garden eels,Family,NA,NA,Congridae,Anguilliformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,69,3,87,17,NA,NA,NA,NA,NA,19
+Cottidae,NA,Cottidae,Sculpins,Family,NA,NA,Cottidae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,19,1,205,30,NA,NA,NA,NA,NA,2
+Cyclopteridae,NA,Cyclopteridae,Lumpfish,Family,NA,NA,Cyclopteridae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,25,2,NA,NA,NA,NA,NA,NA
+Gadidae,NA,Gadidae,Cods,Family,NA,NA,Gadidae,Gadiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,2,9,10,NA,2,NA,NA,NA,NA
+Gobiidae,NA,Gobiidae,True gobies,Family,NA,NA,Gobiidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,8,NA,1028,233,NA,NA,42,8,NA,524
+Holocentridae,NA,Holocentridae,"Squirrelfish, soldierfish",Family,NA,NA,Holocentridae,Beryciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,2,NA,12,3,NA,NA,2,NA,NA,67
+Labridae,NA,Labridae,Wrasses,Family,NA,NA,Labridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,1,NA,74,11,NA,NA,12,NA,NA,450
+Lutjanidae,NA,Lutjanidae,Snappers,Family,NA,NA,Lutjanidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,3,NA,19,8,NA,NA,NA,NA,NA,83
+Macrouridae,NA,Macrouridae,Deep sea Gadiformes,Family,NA,NA,Macrouridae,Gadiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,201,70,2,132,NA,1,NA,NA,NA,NA
+Moridae,NA,Moridae,"Codlings, hakelings, moras",Family,NA,NA,Moridae,Gadiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,37,20,11,37,NA,2,NA,NA,NA,1
+Muraenidae,NA,Muraenidae,Moray eels,Family,NA,NA,Muraenidae,Anguilliformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,3,NA,84,8,NA,NA,NA,NA,NA,107
+Myctophidae,NA,Myctophidae,Lanternfish,Family,NA,NA,Myctophidae,Myctophiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,4,190,1,8,NA,44,1,NA,NA,NA
+Ogcocephalidae,NA,Ogcocephalidae,"Deep sea anglerfish, batfishes, seabats",Family,NA,NA,Ogcocephalidae,Lophiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,43,1,23,1,NA,1,NA,NA,NA,9
+Ophichthidae,NA,Ophichthidae,Snake eels,Family,NA,NA,Ophichthidae,Anguilliformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,16,3,215,36,NA,NA,1,NA,NA,52
+Ophidiidae,NA,Ophidiidae,Cusk-eels,Family,NA,NA,Ophidiidae,Ophidiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,126,12,46,61,NA,1,1,NA,NA,11
+Paralepidae,synonym,Paralepididae,Barracudina,Family,NA,NA,Paralepidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,43,NA,1,NA,11,3,NA,NA,NA
+Pleuronectidae,NA,Pleuronectidae,Righteye flounders,Family,NA,NA,Pleuronectidae,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,17,NA,84,2,NA,NA,NA,NA,NA,NA
+Pomacentridae,NA,Pomacentridae,"Damselfishes, clownfishes",Family,NA,NA,Pomacentridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,15,2,NA,NA,4,NA,NA,379
+Scaridae,NA,Scaridae,Parrotfishes,Family,NA,NA,Scaridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,4,1,NA,NA,NA,NA,NA,95
+Sciaenidae,NA,Sciaenidae,"Drums, croakers",Family,NA,NA,Sciaenidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,2,150,111,NA,NA,6,8,NA,9
+Scombridae,NA,Scombridae,"Mackerel, tuna, bonito",Family,NA,NA,Scombridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,NA,NA,NA,12,35,NA,NA,7
+Scorpaenidae,NA,Scorpaenidae,Scorpionfishes,Family,NA,NA,Scorpaenidae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,12,1,121,7,NA,NA,7,NA,NA,75
+Serranidae,NA,Serranidae,"Basses, groupers",Family,NA,NA,Serranidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,13,3,167,25,NA,7,17,NA,NA,317
+Squalidae,NA,Squalidae,"dogfish sharks, spiny dogfish",Family,NA,NA,Squalidae,Squaliformes,Elasmobranchii,Chondrichthyes,Chordata,Animalia,fish,NA,NA,NA,9,NA,4,6,NA,14,2,NA,NA,NA
+Sternoptychidae,NA,Sternoptychidae,deepsea hatchetfishes,Family,NA,NA,Sternoptychidae,Stomiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,6,39,NA,20,NA,9,NA,NA,NA,NA
+Stomiidae,NA,Stomiidae,Barbeled dragonfishes,Family,NA,NA,Stomiidae,Stomiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,4,206,NA,2,NA,75,NA,NA,NA,NA
+Stromateidae,NA,Stromateidae,Butterfish,Family,NA,NA,Stromateidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,NA,NA,15,NA,NA,2,NA,NA,NA
+Syngnathidae,NA,Syngnathidae,"seahorses, pipefish, seadragons",Family,NA,NA,Syngnathidae,Syngnathiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,2,NA,170,18,NA,1,7,1,NA,105
+Synodontidae,NA,Synodontidae,Lizardfish,Family,NA,NA,Synodontidae,Aulopiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,2,NA,35,9,NA,NA,7,NA,NA,22
+Tetraodontidae,NA,Tetraodontidae,Pufferfish,Family,NA,NA,Tetraodontidae,Tetraodontiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,1,NA,128,9,NA,NA,3,2,NA,57
+Trichiuridae,NA,Trichiuridae,Cutlassfish,Family,NA,NA,Trichiuridae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,NA,1,NA,44,NA,NA,NA,NA,NA,NA
+Triglidae,NA,Triglidae,"Sea robins, gurnard",Family,NA,NA,Triglidae,Scorpaeniformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,24,NA,90,7,NA,NA,NA,NA,NA,4
+Uranoscopidae,NA,Uranoscopidae,Stargazers,Family,NA,NA,Uranoscopidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,7,1,38,4,NA,NA,NA,NA,NA,3
+Zoarcidae,NA,Zoarcidae,Eelpouts,Family,NA,NA,Zoarcidae,Perciformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,167,23,100,12,NA,NA,1,NA,NA,1
+Anguilliformes,NA,Anguilliformes,Eels,Order,NA,NA,NA,Anguilliformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,137,32,461,91,NA,3,1,NA,NA,193
+Lophiiformes,NA,Lophiiformes,Anglerfish,Order,NA,NA,NA,Lophiiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,86,159,72,6,NA,1,1,NA,NA,38
+Pleuronectiformes,NA,Pleuronectiformes,Flatfish,Order,NA,NA,NA,Pleuronectiformes,Actinopterygii,Osteichthyes,Chordata,Animalia,fish,NA,NA,NA,108,4,605,27,NA,NA,3,NA,NA,40
+Selachimorpha,invalid,Elasmobranchii,"Sharks, rays, and skates",Class,NA,NA,NA,NA,Elasmobranchii,Chondrichthyes,Chordata,Animalia,fish,NA,NA,NA,326,34,480,171,NA,83,35,1,NA,104
+Ovalipes,NA,Ovalipes,Crabs,Genus,Ovalipes,NA,Portunidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,NA,NA,NA,NA,NA,NA,NA,8,NA,NA,1,NA,NA
+Penaeus,NA,Penaeus,Prawns,Genus,Penaeus,NA,Penaeidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,NA,NA,NA,NA,NA,NA,NA,6,NA,NA,NA,NA,NA
+Calappidae,NA,Calappidae,Crabs,Family,NA,NA,Calappidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,NA,NA,NA,NA,NA,2,NA,43,NA,NA,NA,NA,1
+Cancridae,NA,Cancridae,Crabs,Family,NA,NA,Cancridae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,NA,NA,NA,NA,NA,1,NA,22,NA,NA,NA,NA,NA
+Galatheidae,NA,Galatheidae,Squat lobsters,Family,NA,NA,Galatheidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,NA,NA,NA,1,NA,70,NA,287,NA,NA,1,NA,2
+Majidae,NA,Majidae,Crabs,Family,NA,NA,Majidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,NA,NA,NA,NA,NA,23,NA,92,NA,NA,NA,NA,5
+Portunidae,NA,Portunidae,Swimming crabs,Family,NA,NA,Portunidae,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,NA,NA,NA,NA,NA,27,22,152,NA,NA,4,NA,13
+Sepiolidae,NA,Sepiolidae,Bobtail squid,Family,NA,NA,Sepiolidae,Sepiolida,Cephalopoda,NA,Mollusca,Animalia,not_fish,NA,NA,NA,1,NA,31,4,26,3,NA,2,NA,NA
+Crustacea shrimp,common_name,Decapoda,Shrimp,Order,NA,NA,NA,Decapoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,11,37,1,8,55,1159,45,4195,1,1,223,1,291
+Octopoda,NA,Octopoda,Octopus,Order,NA,NA,NA,Octopoda,Cephalopoda,NA,Mollusca,Animalia,not_fish,11,NA,NA,2,3,190,3,103,1,1,29,NA,10
+Stomatopoda,NA,Stomatopoda,Mantis shrimp,Order,NA,NA,NA,Stomatopoda,Malacostraca,NA,Arthropoda,Animalia,not_fish,NA,NA,NA,NA,NA,203,NA,146,NA,NA,2,NA,46
+Stelleroidea,invalid,Asteroidea,Sea stars,Class,NA,NA,NA,NA,Asteroidea,NA,Echinodermata,Animalia,not_fish,NA,NA,1,6,NA,NA,NA,665,NA,NA,NA,NA,26
+Cephalopoda,NA,Cephalopoda,"Squid, octopus, cuttlefish, nautilus",Class,NA,NA,NA,NA,Cephalopoda,NA,Mollusca,Animalia,not_fish,18,NA,NA,3,18,446,20,187,35,2,159,NA,21

@@ -1,0 +1,457 @@
+---
+title: "EDA 4 - Basic mapping and species counts"
+author: "Erin LaBrecque"
+date: "10/21/2020"
+output: html_document
+---
+
+This is file 4 of an exploratory data analysis (EDA) of the NEFSC Bottom Trawl Survey catch counts from 2008 through 2019.
+
+EDA 1 cleans the species data using FishBase and SeaLifeBase.  
+EDA 2 lists out all the species names, does some more name cleaning, and combines the species information with the trawl count data.
+EDA 3 queries FishBase for swim bladder information (but I do not trust it) and SeaLifeBase and FishBase for habitat information.  
+
+This EDA plots out the spatial and temporal study areas, finds a few more data mistakes, and takes a high-level look at the counts of Fish and Not Fish species. 
+
+
+```{r setup, results='hide', message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, 
+                      fig.width = 7, fig.height = 6.5)
+library(knitr)
+library(tidyverse)
+library(lubridate)
+library(kableExtra)
+library(rfishbase)
+library(sf)
+library(leaflet)
+```
+
+
+# Loading the data  
+These are the outputs from the first and third EDA files.  
+```{r readin}
+dta <- read_rds("output_input/dta.rds")
+dta_ed <- read_rds("output_input/dta_ed.rds")
+
+sp_fish <- read_rds("output_input/sp_fish_2.rds") 
+sp_sealife <- read_rds("output_input/sp_sealife_2.rds")
+
+non_sp <- read_rds("output_input/non_sp.rds")
+non_sp_habitat <- read_rds("output_input/non_sp_habitat.rds")
+```
+
+# Spatial data  
+
+Creating a spatial data frame to plot the stations. 
+```{r spatial}
+meta_data <- c("cruiseid", "cruise", "station", "beginlon", "beginlat", "begindatetime", "stratum")
+
+dta_sp <- dta %>%
+  filter(!is.na(begindatetime)) %>% 
+  select(all_of(meta_data)) %>% 
+  st_as_sf(coords = c("beginlon", "beginlat"), crs = 4326)
+
+strata <- st_read("shpfiles/BTS_strata/no_prj/finstr.shp", crs = 4326)
+```
+
+## Basemap creation
+```{r basemap}
+base_map <- leaflet(options = leafletOptions(zoomControl = TRUE,
+                                             zoomSnap = 0.1)) %>% 
+  # add ocean basemap
+  addProviderTiles("Esri.OceanBasemap") %>%
+
+  # add another layer with place names
+  addProviderTiles("Hydda.RoadsAndLabels", group = 'Place names') %>%
+  
+  # add graticules from a NOAA webserver - commented out because I think they
+  # add clutter
+  # addWMSTiles(
+  #   "https://gis.ngdc.noaa.gov/arcgis/services/graticule/MapServer/WMSServer/",
+  #   layers = c("1-degree grid", "5-degree grid"),
+  #   options = WMSTileOptions(format = "image/png8", transparent = TRUE),
+  #   attribution = NULL,group = 'Graticules') %>%
+  
+  # add a map scalebar
+  addScaleBar(position = 'bottomright') %>% 
+
+# focus map in a certain area / zoom level
+  setView(lng = -72.201, lat = 39.308, zoom = 6)
+
+# or set the boundary
+#fitBounds(lng1 = -82.4, lat1 = 16.0, lng2 = -32.0, lat2 = 71.2)
+```
+
+## Stations overlaid on strata    
+
+The dots have a degree of transparency - darker blue areas indicate more sampling than lighter blue areas.
+
+```{r plot_all}
+base_map %>% 
+  addPolygons(data = strata,
+              color = "#000000",
+              weight = 1,
+              fillColor = "C0C0C0") %>% 
+  addCircles(data = dta_sp,
+             weight = 2) %>% 
+  addMiniMap(position = "topleft", width = 125, height = 125)
+```
+<br/> 
+
+I removed the projection file (world Mercator) from the shapefile before reading it in. This made it a lot easier to give the strata polygon a coordinate reference system (CRS) that was not tainted by a projection.
+
+### Quick check that the point data and polygon data match up.
+I was playing with the data in QGIS and found some discrepancies between strata ID and strata listed in the BTS data file. I initially thought the strata discrepancies had to do with the World Mercator projection (BTS file is not projected), but after removing the projection and making sure both the point data and polygon data have the same CRS, there are still strata discrepancies. The following is a list of BTS points with a stratum that does not match the stratum of the polygon it is in. 
+ 
+```{r strata_id_check}
+# pulling out the attributes from the polygon to add to the points
+strata_id <- strata %>% 
+  select(FINSTR_G_, FINSTR_G_I, STRATA)
+
+# Spatial Intersection 
+# adding the polygon information to the points
+id_check <- dta_sp %>% 
+  st_intersection(strata_id) %>% 
+  filter(stratum != STRATA)
+
+# printing out the points with strata information that does NOT match 
+# the strata id in the polygon file
+id_check %>%
+  kable(caption = "These data points from the BTS data sets might have mislabeled strata information. Blue = BTS data. Grey = information sampled from strata polygons.") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  column_spec(c(5, 8), bold = TRUE) %>% 
+  column_spec(1:5, color = "blue") %>% 
+  column_spec(6:9, color = "grey")
+```
+<br/>  
+
+
+When viewing map below in your browser, you can zoom in and out. I also added the point attributes to a popup. Click on a station and the data will pop up. 
+
+```{r map_strata_comparison}
+base_map %>% 
+   addPolygons(data = strata,
+              color = "#000000",
+              weight = 1,
+              fillColor = "C0C0C0") %>% 
+  addCircles(data = id_check,
+             weight = 4,
+             opacity = 1,
+             popup = ~paste0("Cruise ID: ", cruiseid,"<br/>", 
+                             "Station: ", station,"<br/>", 
+                             "Datetime: ", begindatetime, "<br/>", 
+                             "BTS stratum: ", stratum, "<br/>",
+                             "Polygon stratum: ", STRATA, "<br/>",
+                             "long/lat: ", geometry)) %>%
+  addMiniMap(position = "topleft", width = 125, height = 125)
+```
+<br/>  
+
+### Questions:  
+- How were the strata determined?   
+    - Are they an ecological unit based on depth?    
+- Should the strata for the above BTS points be changed to the corresponding the polygon strata?
+
+
+# Temporal data
+
+Each dot is the datetime and yearday of a sampling period (station).  
+
+```{r date_over_time}
+dta_1 <- dta %>%
+  filter(!is.na(begindatetime)) %>% 
+  select(all_of(meta_data)) %>% 
+  mutate(yearday = yday(begindatetime),
+         month = month(begindatetime, label = TRUE, abbr = FALSE),
+         year = year(begindatetime))
+
+start <- dta_1 %>% 
+  filter(!is.na(begindatetime)) %>% 
+  summarize(min = min(begindatetime))
+
+dta_1 %>% 
+ggplot(aes(begindatetime, yearday)) +
+  geom_jitter() +
+  annotate("text", label = "February", x = start$min, y = 50, size = 3, color = "black") +
+  annotate("text", label = "March", x = start$min, y = 62, size = 3, color = "black") +
+  annotate("text", label = "April", x = start$min, y = 104, size = 3, color = "black") +
+  annotate("text", label = "May", x = start$min, y = 135, size = 3, color = "black") +
+  annotate("text", label = "June", x = start$min, y = 155, size = 3, color = "black") +
+  geom_hline(yintercept = c(60, 91, 121, 152), linetype = 2, color = "blue") +
+  theme_bw() +
+  scale_x_datetime() +
+  ylim(45, 165) +
+  labs(x = "Year",
+       y = "Yearday",
+       caption = "Blue dotted lines demarcate months.\n Leap year was not taken into account when determining yearday breaks for months.")
+```
+<br/>  
+
+### Questions:   
+- Should the February and June data be removed?    
+- Should I only be looking at the data from April?  
+
+
+# Summary of SPECIES habitat 
+
+To recap from EDA 3:  
+
+The [SPECIES](https://www.fishbase.se/manual/english/fishbasethe_species_table.htm) table in FishBase has information on the depth range and the preferred environment of each species. The following definitions are from the website. 
+
+**Habitat**: Indicates the particular environment preferred by the species, with the following choices (adapted from Holthus and Maragos 1995):  
+
+*pelagic*: occurring mainly in the water column between 0 and 200 m, not feeding on benthic organisms;  
+
+*benthopelagic*: living and/or feeding on or near the bottom, as well as in midwater, between 0 and 200 m;  
+
+*demersal*: living and/or feeding on or near the bottom, between 0 and 200 m;  
+
+*reef-associated*: living and/or feeding on or near reefs, between 0 and 200 m;  
+
+*bathypelagic*: occurring mainly in open water below 200 m, not feeding on benthic organisms;  
+
+*bathydemersal*: living and/or feeding on or near the bottom, below 200 m.  
+
+
+> Holthus, P.F. and J.E. Maragos. 1995. Marine ecosystem classification for the tropical island Pacific, p. 239-278. In J.E. Maragos, M.N.A. Peterson, L.G. Eldredge, J.E. Bardach and H.F. Takeuchi (eds.) Marine and coastal biodiversity in the tropical island Pacific region. Vol. 1. Species Management and Information Management Priorities. East-West Center, Honolulu, Hawaii. 424 p.  
+
+<br/>  
+
+*Pelagic-neritic*, *pleagic-oceanic*, and *reef-associated* are also choices for preferred depth but definitions are not given on the FishBase SPECIES table website.  
+
+*Pelagic-neritic*: the marine waters column above the continental shelf, some definitions specify the low tide line to the shelf break;  
+
+*pleagic-oceanic*: living in all open water that is not pelagic-neritic;  
+
+*reef-associated*: associated with reefs.  
+
+## Counts for species
+(Repeat from EDA 3)
+
+These are the counts of species listed in the BTS data broken down by their habitat type and grouped by "fish" or "not fish". These are not individual counts from the trawl data. 
+
+```{r habitat_summary}
+# setting up levels of habitat variables for plotting order
+# hab_levs_1 <- c("reef-associated", "pelagic", "pelagic-neritic","pelagic-oceanic", 
+#             "benthic", "benthopelagic", "demersal", "bathypelagic", "bathydemersal")
+
+hab_levs_2 <- c("bathydemersal", "bathypelagic",  "demersal", "benthopelagic",
+                "benthic", "pelagic-oceanic", "pelagic-neritic", "pelagic",
+                "reef-associated")
+labels <- c(fish = "Fish", not_fish = "Not Fish")
+
+# plot of habitat types represented in the BTS data (species only)
+sp_fish %>% 
+  bind_rows(sp_sealife) %>% 
+  count(type, DemersPelag) %>% 
+  ggplot(aes(fct_relevel(DemersPelag, hab_levs_2), n, fill = type, label = n)) +
+  geom_col() +
+  geom_text(hjust = -0.5) +
+  coord_flip() +
+  facet_grid(~ type, labeller=labeller(type = labels)) +
+  ylim(0, 150) +
+  theme_bw() +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d() +
+  theme(axis.text.y = element_text(size = 10)) +
+  labs(y = "Count",
+       x = NULL, 
+       caption = "Count of habitat type associated with species observations in the BTS (2008 - 2019) data")
+```
+
+The section below is code to show the counts from the graph above in tables. It is commented out.
+Delete the # in the code below if you would like to see the tables along with the graph.  
+
+```{r DemersaPelag_cont_tables}
+# sp_fish %>% 
+#   count(DemersPelag) %>% 
+#   kable(col.names = c("Habitat", "Count"), 
+#         caption = "Counts of species....") %>% 
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+# 
+# sp_sealife %>% 
+#   count(DemersPelag) %>% 
+#   kable(col.names = c("Habitat", "Count"), 
+#         caption = "Counts of species....") %>% 
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+```
+<br/>  
+
+## Joining the trawl data to the species data
+All the work so far has been to assess the species in the data sets without looking at the counts of organisms from the trawls. Here we add the taxonomic and habitat data to the trawl count data for species.   
+
+```{r combining_information}
+# making a single data frame to add to the count data
+both_fish_sealife <- bind_rows(sp_fish, sp_sealife)
+
+# combining the count data with the species data
+dta_sp_only <- dta_ed %>% 
+  left_join(both_fish_sealife, by = c("taxa"= "BTS_sp")) %>% # using the BTS names here
+  rename(BTS_sp = taxa) %>% 
+  filter(!is.na(Species)) %>% 
+  mutate(level = "Species")
+```
+
+**Note:** `dta_sp_only` from EDA 2 was saved in the `input_output` folder as `dta_and_species.rds`. That file version does not have the swim bladder or habitat information from EDA 3 attached to it. Please be aware of what data you have loaded.
+
+
+# Broad scale counts  
+
+What are the broad-scale counts for "Fish" and "Not Fish" species by Cruise ID?
+
+```{r}
+dta_sp_only %>% 
+  count(type, cruiseid) %>% 
+  ggplot(aes(type, n, fill = type, label = n)) + 
+  geom_col(position =  position_dodge2(preserve = "single")) +
+  geom_text(hjust = -0.1, size = 3) +
+  coord_flip() +
+  ylim(0, 7000) +
+  scale_fill_viridis_d(breaks = c("not_fish", "fish"),
+                       labels = c("Not Fish", "Fish")) +
+  facet_wrap(~ cruiseid) +
+  theme_bw() +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  labs(y = "Count",
+       x = NULL,
+       fill = NULL,
+       caption = "Counts of fish individuals and not fish individuals from the BTS 2008 - 2019 data.")
+```
+
+<br/>  
+
+# Habitat types  
+
+What is the breakdown of habitat types for "Fish" and "Not Fish" species by Cruise ID?  
+
+```{r plot_fish_notfish}
+dta_sp_only %>%
+  count(DemersPelag, cruiseid, type) %>% 
+  ggplot(aes(fct_relevel(DemersPelag, hab_levs_2), n, fill = type)) +
+  geom_col(position =  position_dodge2(preserve = "single")) +
+  scale_fill_viridis_d(labels = c("Fish", "Not Fish")) +
+  coord_flip() +
+  facet_wrap(~ cruiseid) +
+  theme_bw() +
+  labs(y = "Count",
+       x = NULL,
+       fill = NULL)
+```
+
+There are `r nrow(sp_fish) + nrow(sp_sealife)` species represented in the BTS data. Making a bar chart of all of them would be an exercise in very bad data visualization. 
+
+### Question:  
+How would you like the data aggregated and visualized?
+
+
+# Guessing at groups
+
+<br/>  
+
+**For the species that are Not Fish:**
+
+|Vertebrates|Invertebrates|
+|---|-------------|
+|Sea turtles|Octopodes|
+|Seals|Squids|
+| |Crabs|  
+| |Lobsters|    
+| |Shrimps|  
+| |Whelks|  
+| |Scallop|   
+| |Sea starts| 
+
+<br/>
+
+**For the species that are Fish:**  
+- I need to look at the species list in EDA 2 and would like some help here please. :)
+
+## Quick and dirty example of guild plotting  
+I am pulling out everything in the trawl data from Class Elasmobranchii to play with.
+
+```{r shark_play, fig.height=10, fig.width=8}
+sharks <- dta_sp_only %>% 
+  filter(Class == "Elasmobranchii")
+
+sharks %>% 
+  count(BTS_sp, Com_name) %>% 
+  kable(col.names = c("Scientific name", "Common Name", "Count")) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  column_spec(1, italic = TRUE)
+
+sharks %>% 
+  count(Com_name, cruiseid) %>% 
+  ggplot(aes(fct_reorder(Com_name, n), n)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(~ cruiseid) +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 7)) +
+  labs(y = "Count", 
+       x = NULL,
+       caption = "Counts of Elasmobranchii catches by cruise.")
+
+sharks %>%
+  count(Com_name, month) %>%
+  filter(!is.na(month)) %>% 
+  ggplot(aes(fct_reorder(Com_name, n), n)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(~ month, scales = "free_x") +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 8)) +
+  labs(y = "Count", 
+       x = NULL,
+       caption = "Counts of Elasmobranchii catches by month. \n x-axis on different scales.")
+
+sharks %>% 
+  count(Com_name, DemersPelag) %>% 
+  filter(n > 250) %>% 
+  ggplot(aes(fct_reorder(Com_name, n), n)) +
+  geom_col() +
+  facet_wrap(~ DemersPelag) +
+  coord_flip() +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 8)) +
+  labs(y = "Count", 
+       x = NULL,
+       fill = "Habitat",
+       caption = "Counts greater than 250 individual Elasmobranchii.")
+
+  
+sharks %>% 
+  count(Com_name, DemersPelag) %>% 
+  filter(n <= 250) %>% 
+  ggplot(aes(fct_reorder(Com_name, n), n)) +
+  geom_col() +
+  facet_wrap(~ DemersPelag) +
+  coord_flip() +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 8)) +
+  labs(y = "Count", 
+       x = NULL,
+       fill = "Habitat",
+       caption = "Counts less than or equal to 250 individual Elasmobranchii.")
+
+
+sharks %>% 
+  filter(!is.na(year)) %>%
+  mutate(year = as.factor(year)) %>% 
+  count(Com_name, year) %>% 
+  ggplot(aes(year, n, group = Com_name, color = Com_name)) +
+  geom_line() +
+  scale_color_viridis_d() +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(ncol = 4)) +
+  labs(x = "Year",
+       y = "Count",
+       color = NULL,
+       caption = "Amount of individuals collected during the trawl surveys for that year.")
+
+```
+<br/>  
+
+
+

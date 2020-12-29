@@ -1,0 +1,354 @@
+---
+title: "EDA 6 - Playing with maps"
+author: "Erin LaBrecque"
+date: "10/23/2020"
+output: html_document
+---
+
+This is file 5 of an exploratory data analysis (EDA) of the NEFSC Bottom Trawl Survey catch counts from 2008 through 2019.
+
+EDA 1 cleans the species data using FishBase and SeaLifeBase.  
+EDA 2 lists out all the species names, does some more name cleaning, and combines the species information with the trawl count data.
+EDA 3 queries FishBase for swim bladder information (but I do not trust it) and SeaLifeBase and FishBase for habitat information.  
+EDA 4 plots the spatial and temporal study areas, finds a few more data mistakes, and takes a high-level look at the counts of Fish and Not Fish species. 
+
+This EDA will play with maps to see what works and what does not.
+
+
+```{r setup, results='hide', message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, 
+                      fig.width = 7, fig.height = 6.5)
+library(knitr)
+library(tidyverse)
+library(lubridate)
+library(kableExtra)
+library(sf)
+library(ggspatial)
+```
+
+
+# Loading the data  
+These are the outputs from the first and third EDA files.  
+```{r readin}
+dta <- read_rds("output_input/dta.rds")
+dta_ed <- read_rds("output_input/dta_ed.rds")
+
+sp_fish <- read_rds("output_input/sp_fish_2.rds") 
+sp_sealife <- read_rds("output_input/sp_sealife_2.rds")
+
+non_sp <- read_rds("output_input/non_sp.rds")
+non_sp_habitat <- read_rds("output_input/non_sp_habitat.rds")
+
+#this is the shapefile (minus the projection) of the strata
+strata <- st_read("shpfiles/BTS_strata/no_prj/finstr.shp", crs = 4326)
+```
+
+
+```{r combining_information}
+# making a single data frame to add to the count data
+both_fish_sealife <- bind_rows(sp_fish, sp_sealife)
+
+# combining the count data with the species data
+dta_sp_only <- dta_ed %>% 
+  left_join(both_fish_sealife, by = c("taxa"= "BTS_sp")) %>% # using the BTS names here
+  rename(BTS_sp = taxa) %>% 
+  filter(!is.na(Species)) %>% 
+  mutate(level = "Species")
+```
+
+# Spatial data  
+
+Creating a spatial data frame to plot the stations. 
+```{r spatial}
+meta_data <- c("cruiseid", "cruise", "station", "beginlon", "beginlat", "begindatetime", "stratum", "year")
+
+station_spt <- dta %>%
+  filter(!is.na(begindatetime)) %>% 
+  mutate(year = year(begindatetime)) %>% 
+  select(all_of(meta_data)) %>% 
+  st_as_sf(coords = c("beginlon", "beginlat"), crs = 4326)
+
+esri_ocean <- paste0('https://services.arcgisonline.com/arcgis/rest/services/',
+                     'Ocean/World_Ocean_Base/MapServer/tile/${z}/${y}/${x}.jpeg')
+
+station_spt %>% plot()
+
+station_spt <- station_spt %>%
+  mutate(period = ifelse(between(year, 2012, 2019), 2, 1))
+
+p1 <- ggplot() + 
+  annotation_map_tile(type = esri_ocean, progress = "none") +
+  layer_spatial(filter(station_spt, period == 1), color = "blue")
+
+p2 <- ggplot() + 
+  annotation_map_tile(type = esri_ocean, progress = "none") +
+  layer_spatial(filter(station_spt, period == 2), color = "red")
+library(patchwork)
+
+
+p1 + p2
+```
+
+## Basemap creation
+```{r basemap}
+base_map <- leaflet(options = leafletOptions(zoomControl = TRUE,
+                                             zoomSnap = 0.1)) %>% 
+  # add ocean basemap
+  addProviderTiles("Esri.OceanBasemap") %>%
+
+  # add another layer with place names
+  addProviderTiles("Hydda.RoadsAndLabels", group = 'Place names') %>%
+  
+  # add graticules from a NOAA webserver - commented out because I think they
+  # add clutter
+  # addWMSTiles(
+  #   "https://gis.ngdc.noaa.gov/arcgis/services/graticule/MapServer/WMSServer/",
+  #   layers = c("1-degree grid", "5-degree grid"),
+  #   options = WMSTileOptions(format = "image/png8", transparent = TRUE),
+  #   attribution = NULL,group = 'Graticules') %>%
+  
+  # add a map scalebar
+  addScaleBar(position = 'bottomright') %>% 
+
+# focus map in a certain area / zoom level
+  setView(lng = -72.201, lat = 39.308, zoom = 6)
+
+# or set the boundary
+#fitBounds(lng1 = -82.4, lat1 = 16.0, lng2 = -32.0, lat2 = 71.2)
+```
+
+## Stations overlaid on strata    
+
+The dots have a degree of transparency - darker blue areas indicate more sampling than lighter blue areas.
+
+```{r plot_all}
+base_map %>% 
+  addPolygons(data = strata,
+              color = "#000000",
+              weight = 1,
+              fillColor = "C0C0C0") %>% 
+  addCircles(data = dta_sp,
+             weight = 2) %>% 
+  addMiniMap(position = "topleft", width = 125, height = 125)
+```
+<br/> 
+
+I removed the projection file (world Mercator) from the shapefile before reading it in. This made it a lot easier to give the strata polygon a coordinate reference system (CRS) that was not tainted by a projection.
+
+### Quick check that the point data and polygon data match up.
+I was playing with the data in QGIS and found some discrepancies between strata ID and strata listed in the BTS data file. I initially thought the strata discrepancies had to do with the World Mercator projection (BTS file is not projected), but after removing the projection and making sure both the point data and polygon data have the same CRS, there are still strata discrepancies. The following is a list of BTS points with a stratum that does not match the stratum of the polygon it is in. 
+ 
+```{r strata_id_check}
+# pulling out the attributes from the polygon to add to the points
+strata_id <- strata %>% 
+  select(FINSTR_G_, FINSTR_G_I, STRATA)
+
+# Spatial Intersection 
+# adding the polygon information to the points
+id_check <- dta_sp %>% 
+  st_intersection(strata_id) %>% 
+  filter(stratum != STRATA)
+
+# printing out the points with strata information that does NOT match 
+# the strata id in the polygon file
+id_check %>%
+  kable(caption = "These data points from the BTS data sets might have mislabeled strata information. Blue = BTS data. Grey = information sampled from strata polygons.") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+  column_spec(c(5, 8), bold = TRUE) %>% 
+  column_spec(1:5, color = "blue") %>% 
+  column_spec(6:9, color = "grey")
+```
+<br/>  
+
+
+When viewing map below in your browser, you can zoom in and out. I also added the point attributes to a popup. Click on a station and the data will pop up. 
+
+```{r map_strata_comparison}
+base_map %>% 
+   addPolygons(data = strata,
+              color = "#000000",
+              weight = 1,
+              fillColor = "C0C0C0") %>% 
+  addCircles(data = id_check,
+             weight = 4,
+             opacity = 1,
+             popup = ~paste0("Cruise ID: ", cruiseid,"<br/>", 
+                             "Station: ", station,"<br/>", 
+                             "Datetime: ", begindatetime, "<br/>", 
+                             "BTS stratum: ", stratum, "<br/>",
+                             "Polygon stratum: ", STRATA, "<br/>",
+                             "long/lat: ", geometry)) %>%
+  addMiniMap(position = "topleft", width = 125, height = 125)
+```
+<br/>  
+
+### Questions:  
+- How were the strata determined?   
+    - Are they an ecological unit based on depth?    
+- Should the strata for the above BTS points be changed to the corresponding the polygon strata?
+
+
+NON HABITAT TAXA (from other EDA 5)
+
+# Spatial data  
+
+Creating a spatial data frame to plot the stations. 
+```{r spatial}
+meta_data <- c("cruiseid", "cruise", "station", "beginlon", "beginlat", "begindatetime", "stratum")
+
+dta_station_spt <- dta %>%
+  filter(!is.na(begindatetime)) %>% 
+  select(all_of(meta_data)) %>% 
+  st_as_sf(coords = c("beginlon", "beginlat"), crs = 4326)
+
+```
+
+## Basemap creation
+```{r basemap}
+base_map <- leaflet(options = leafletOptions(zoomControl = TRUE,
+                                             zoomSnap = 0.1)) %>% 
+  # add ocean basemap
+  addProviderTiles("Esri.OceanBasemap") %>%
+
+  # add another layer with place names
+  addProviderTiles("Hydda.RoadsAndLabels", group = 'Place names') %>%
+  
+  # add graticules from a NOAA webserver - commented out because I think they
+  # add clutter
+  # addWMSTiles(
+  #   "https://gis.ngdc.noaa.gov/arcgis/services/graticule/MapServer/WMSServer/",
+  #   layers = c("1-degree grid", "5-degree grid"),
+  #   options = WMSTileOptions(format = "image/png8", transparent = TRUE),
+  #   attribution = NULL,group = 'Graticules') %>%
+  
+  # add a map scalebar
+  addScaleBar(position = 'bottomright') %>% 
+
+# focus map in a certain area / zoom level
+  setView(lng = -72.201, lat = 39.308, zoom = 6)
+
+# or set the boundary
+#fitBounds(lng1 = -82.4, lat1 = 16.0, lng2 = -32.0, lat2 = 71.2)
+```
+
+## Non species with no habitat data
+```{r}
+singles <- BTS_dta_not_sp_nohab_dist_info %>% 
+  count(cruiseid, station, beginlon, beginlat) %>% 
+  filter(n == 1) %>% 
+  select(-n) %>% 
+  left_join(BTS_dta_not_sp_nohab_dist_info %>% 
+              select(-beginlon, -beginlat), by = c("cruiseid", "station")) %>% 
+  mutate(taxa = factor(taxa, levels = nosp_no_dist_levels_1))
+  
+
+singles_spt <- singles %>% 
+  filter(!is.na(begindatetime)) %>% 
+  st_as_sf(coords = c("beginlon", "beginlat"), crs = 4326) 
+
+colors <- pals::alphabet2(11)
+
+taxa_pal <- colorFactor(palette = colors, levels = singles$taxa)
+
+base_map %>% 
+  addPolygons(data = strata,
+              color = "#000000",
+              weight = 1,
+              fillColor = "C0C0C0") %>% 
+  addCircles(data = singles_spt,
+             color = ~taxa_pal(taxa),
+             weight = 2,
+             opacity = 1, 
+             fillColor = ~taxa_pal(taxa),
+             fillOpacity = 1,
+             radius = ~count * 40,
+             popup = ~paste0("Cruise ID: ", cruiseid,"<br/>", 
+                             "Station: ", station,"<br/>", 
+                             "Datetime: ", begindatetime, "<br/>", 
+                             "BTS stratum: ", stratum, "<br/>",
+                             "long/lat: ", geometry, "<br/>",
+                             "Taxa: ", taxa, "<br/>",
+                             "Count:  ", count)) %>%
+  addLegend(data = singles_spt,
+            values = ~taxa,
+            pal = taxa_pal,
+            opacity = 1,
+            title = "Taxa",
+            position = "bottomright") %>%
+  addMiniMap(position = "topleft", width = 125, height = 125)
+
+multiples <- BTS_dta_not_sp_nohab_dist_info %>% 
+  count(cruiseid, station, beginlon, beginlat) %>% 
+  filter(n > 1) %>%
+  select(-n) %>% 
+  left_join(BTS_dta_not_sp_nohab_dist_info %>% 
+              select(-beginlon, -beginlat), by = c("cruiseid", "station")) %>% 
+  mutate(taxa = factor(taxa, levels = nosp_no_dist_levels_1))
+
+multiples %>% 
+  count(taxa) %>% 
+  select(-n) %>% 
+  kable(caption = "Taxa (for color coding) at stations with multiple taxa") %>% 
+  kable_styling()
+
+multiples %>% 
+  count(cruiseid, station) %>% View()
+
+
+no_hab_spt <- BTS_dta_not_sp_nohab_dist_info %>% 
+  mutate(taxa = factor(taxa, levels = nosp_no_dist_levels_1)) %>% 
+  filter(!is.na(begindatetime)) %>% 
+  st_as_sf(coords = c("beginlon", "beginlat"), crs = 4326) 
+```
+
+
+```{r}
+taxa_pal_2 <- colorFactor(palette = colors, levels = unique(no_hab_spt$taxa))
+to_plot <- no_hab_spt %>% 
+  filter(taxa == "Myctophidae")
+
+base_map %>% 
+  addPolygons(data = strata,
+              color = "#000000",
+              weight = 1,
+              fillColor = "C0C0C0") %>% 
+  addCircles(data = to_plot,
+             color = ~taxa_pal_2(taxa),
+             weight = 2,
+             opacity = 1, 
+             fillColor = ~taxa_pal_2(taxa),
+             fillOpacity = 1,
+             radius = ~count * 40,
+             popup = ~paste0("Cruise ID: ", cruiseid,"<br/>", 
+                             "Station: ", station,"<br/>", 
+                             "Datetime: ", begindatetime, "<br/>", 
+                             "BTS stratum: ", stratum, "<br/>",
+                             "long/lat: ", geometry, "<br/>",
+                             "Taxa: ", taxa, "<br/>",
+                             "Count:  ", count)) %>%
+  addLegend(data = to_plot,
+            values = ~taxa,
+            pal = taxa_pal_2,
+            opacity = 1,
+            title = "Taxa",
+            position = "bottomright") %>%
+  addMiniMap(position = "topleft", width = 125, height = 125)
+```
+
+
+```{r}
+#stra_issues <- read_rds("output_input/station_strata_issues.rds")
+
+# converting spatial data frame back to data frame and keeping long/lats
+# stra_is <- stra_issues %>% 
+#   mutate(long = st_coordinates(.)[,1],
+#          lat = st_coordinates(.)[,2]) %>% 
+#   st_drop_geometry()
+# 
+# test <- stra_is %>% 
+#   select(cruiseid, station, begindatetime, stratum, FINSTR_G_I, long, lat) %>% 
+#   right_join(BTS_dta_not_sp_nohab_dist_info, by = c("cruiseid", "station"))
+
+
+```
+
