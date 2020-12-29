@@ -364,12 +364,12 @@ sp_fish_all <- sp_fish_all %>%
 
 This file is getting long. I'll save the outputs here an start a new file to look up habitats and gas bladder information. Un-comment (remove #) to write out the data files.
 ```{r save}
-write_rds(dta, "output_input/dta.rds")
-write_rds(dta_ed, "output_input/dta_ed.rds")
-write_rds(sp_sealife_all, "output_input/sp_sealife.rds")
-sp_fish_all %>% 
-  select(-TSN) %>% 
-  write_rds("output_input/sp_fish.rds")
+# write_rds(dta, "output_input/dta.rds")
+# write_rds(dta_ed, "output_input/dta_ed.rds")
+# write_rds(sp_sealife_all, "output_input/sp_sealife.rds")
+# sp_fish_all %>% 
+#   select(-TSN) %>% 
+#   write_rds("output_input/sp_fish.rds")
 
 ```
 
