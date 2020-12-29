@@ -388,10 +388,10 @@ non_sp_hab_long %>%
 
 Lots of data munging going on in this EDA. Not a lot of outputs, but the data are mostly clean and they have habitat information and the weird swim bladder information for fish species. Un-comment (remove #) to write out the data files.
 ```{r save}
-write_rds(non_sp, "output_input/non_sp.rds")
-write_rds(sp_fish, "output_input/sp_fish_2.rds")
-write_rds(sp_sealife, "output_input/sp_sealife_2.rds")
-write_rds(non_sp_habitat, "output_input/non_sp_habitat.rds")
+# write_rds(non_sp, "output_input/non_sp.rds")
+# write_rds(sp_fish, "output_input/sp_fish_2.rds")
+# write_rds(sp_sealife, "output_input/sp_sealife_2.rds")
+# write_rds(non_sp_habitat, "output_input/non_sp_habitat.rds")
 ```
 
 
