@@ -2,7 +2,8 @@
 title: "EDA 5 - Updated habitat and swim bladders"
 author: "Erin LaBrecque"
 date: "11/20/2020"
-output: html_document
+output: github_document
+always_allow_html: true
 ---
 
 This is file 5 of an exploratory data analysis (EDA) of the NEFSC Bottom Trawl Survey catch counts from 2008 through 2019.
