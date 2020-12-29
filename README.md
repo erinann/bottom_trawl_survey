@@ -1,7 +1,7 @@
 # Bottom Trawl Survey
 Data cleaning and exploratory analysis of bottom trawl survey data.
 
-If you have any questions, shoot me an email or create and issue.
+If you have any questions, shoot me an email or create an issue.
 
 Please note that accessing `FishBase` and `SeaLifeBase` might take a few seconds to a minute or more. 
 
@@ -11,3 +11,5 @@ I changed the YAML heading in all the .Rmd files to outputs `github_documents` f
 
 Except for EDA 4 - the maps make raw files too large to render in GitHub. :( You'll have to download the `HTML` file and open it in your browser. 
 
+
+`BTS_catch-data_WoRMS.R` is stand alone code. It is similar to EDA 1 but it accesses the WoRMS database.
