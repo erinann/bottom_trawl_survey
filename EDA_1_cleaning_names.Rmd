@@ -2,7 +2,8 @@
 title: "EDA 1 - Cleaning species names via rfishbase"
 author: "Erin LaBrecque"
 date: "10/09/2020"
-output: html_document
+output: github_document
+always_allow_html: true
 ---
 
 This is Exploratory Data Analysis (EDA) file 1 of the NEFSC Bottom Trawl Survey catch counts from 2008 through 2019.  
